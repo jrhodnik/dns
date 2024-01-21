@@ -8,8 +8,6 @@ using System.Net;
 
 namespace DNS.Protocol {
     public class Request : IRequest {
-        private static readonly RandomNumberGenerator RANDOM = new RNGCryptoServiceProvider();
-
         private IList<Question> questions;
         private Header header;
         private IList<IResourceRecord> additional;
@@ -125,8 +123,7 @@ namespace DNS.Protocol {
         }
 
         private ushort NextRandomId() {
-            byte[] buffer = new byte[sizeof(ushort)];
-            RANDOM.GetBytes(buffer);
+            var buffer = RandomNumberGenerator.GetBytes(sizeof(ushort));
             return BitConverter.ToUInt16(buffer, 0);
         }
     }
