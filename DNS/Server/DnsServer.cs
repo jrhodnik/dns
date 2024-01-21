@@ -86,7 +86,7 @@ namespace DNS.Server {
             }
         }
 
-        private async void HandleRequest(byte[] data, IPEndPoint remote)
+        private async Task HandleRequest(byte[] data, IPEndPoint remote)
         {
             using var scope = logger.BeginScope("Remote EndPoint: {remote}", remote);
 
@@ -101,18 +101,14 @@ namespace DNS.Server {
 
                 OnEvent(Responded, new RespondedEventArgs(request, response, data, remote));
 
-                using var udp = new UdpClient();
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    udp.Client.IOControl(SIO_UDP_CONNRESET, new byte[4], new byte[4]);
-                }
-
                 await udp
                     .SendAsync(response.ToArray(), response.Size, remote)
                     .WithCancellationTimeout(TimeSpan.FromMilliseconds(UDP_TIMEOUT)).ConfigureAwait(false);
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException) {
+
+                return;
+            }
             catch (Exception e) when (e is ArgumentException or IndexOutOfRangeException or IOException or ObjectDisposedException)
             {
                 logger.LogWarning(e, "Error while handling request.");
