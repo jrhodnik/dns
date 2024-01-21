@@ -122,7 +122,7 @@ namespace DNS.Server {
             Request request = null;
 
             try {
-                request = Request.FromArray(data);
+                request = Request.FromArray(data, remote);
                 OnEvent(Requested, new RequestedEventArgs(request, data, remote));
 
                 IResponse response = await resolver.Resolve(request).ConfigureAwait(false);

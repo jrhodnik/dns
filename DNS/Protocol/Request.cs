@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using DNS.Protocol.Utils;
 using DNS.Protocol.ResourceRecords;
+using System.Net;
 
 namespace DNS.Protocol {
     public class Request : IRequest {
@@ -27,6 +28,13 @@ namespace DNS.Protocol {
             return new Request(header,
                 Question.GetAllFromArray(message, offset, header.QuestionCount, out offset),
                 ResourceRecordFactory.GetAllFromArray(message, offset, header.AdditionalRecordCount, out offset));
+        }
+
+        public static Request FromArray(byte[] message, IPEndPoint requestorEndpoint)
+        {
+            var ret = FromArray(message);
+            ret.RequestorEndPoint = requestorEndpoint;
+            return ret;
         }
 
         public Request(Header header, IList<Question> questions, IList<IResourceRecord> additional) {
@@ -87,6 +95,8 @@ namespace DNS.Protocol {
             get { return header.RecursionDesired; }
             set { header.RecursionDesired = value; }
         }
+
+        public IPEndPoint RequestorEndPoint { get; private set; }
 
         public byte[] ToArray() {
             UpdateHeader();
