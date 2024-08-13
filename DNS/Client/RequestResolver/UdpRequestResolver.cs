@@ -9,9 +9,9 @@ using DNS.Protocol.Utils;
 
 namespace DNS.Client.RequestResolver {
     public class UdpRequestResolver : IRequestResolver {
-        private int timeout;
-        private IRequestResolver fallback;
-        private IPEndPoint dns;
+        private readonly int timeout;
+        private readonly IRequestResolver fallback;
+        private readonly IPEndPoint dns;
 
         public UdpRequestResolver(IPEndPoint dns, IRequestResolver fallback, int timeout = 5000) {
             this.dns = dns;
